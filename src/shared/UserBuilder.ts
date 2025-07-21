@@ -1,4 +1,4 @@
-import { UserType } from './User';
+import { UserType } from '../model/User';
 
 export class UserBuilder {
 	private user: Partial<UserType> = {};

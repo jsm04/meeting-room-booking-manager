@@ -1,5 +1,5 @@
 import SQLite, { Database } from 'bun:sqlite';
-import { UserType } from '../services/User';
+import { UserType } from '../model/User';
 
 type UserWithID = Required<UserType>;
 
@@ -22,36 +22,34 @@ export class UserRepository {
 	}
 
 	add(user: UserWithID): void {
-		this.db.run(
-			`INSERT INTO users (id, name, email) VALUES (?, ?, ?)`,
+		this.db.run(`INSERT INTO users (id, name, email) VALUES (?, ?, ?)`, [
 			user.id,
 			user.name,
-			user.email
-		);
+			user.email,
+		]);
 	}
 
 	getById(id: string): UserWithID | null {
-		const result = this.db.query(`SELECT * FROM users WHERE id = ?`, id);
-		const row = result.get();
+		const result = this.db.query(`SELECT * FROM users WHERE id = ?`);
+		const row = result.get(id) as [string, string, string] | undefined;
 		if (!row) return null;
 		return { id: row[0], name: row[1], email: row[2] };
 	}
 
 	update(user: UserWithID): void {
-		this.db.run(
-			`UPDATE users SET name = ?, email = ? WHERE id = ?`,
+		this.db.run(`UPDATE users SET name = ?, email = ? WHERE id = ?`, [
 			user.name,
 			user.email,
-			user.id
-		);
+			user.id,
+		]);
 	}
 
 	delete(id: string): void {
-		this.db.run(`DELETE FROM users WHERE id = ?`, id);
+		this.db.run(`DELETE FROM users WHERE id = ?`, [id]);
 	}
 
 	getAll(): UserWithID[] {
-		const rows = this.db.query(`SELECT * FROM users`).all();
+		const rows = this.db.query(`SELECT * FROM users`).all() as [string, string, string][];
 		return rows.map((row) => ({ id: row[0], name: row[1], email: row[2] }));
 	}
 }

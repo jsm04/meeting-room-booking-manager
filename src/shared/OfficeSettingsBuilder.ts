@@ -1,6 +1,6 @@
-import { week_days, WeekDay } from '../const';
+import { week_days, WeekDay } from '../domain/const';
 
-export type OfficeSettingsType = {
+export type OfficePropertiesType = {
 	id?: string;
 	name: string;
 	size: number;
@@ -9,8 +9,8 @@ export type OfficeSettingsType = {
 	closingHour: string;
 };
 
-export class OfficeSettingsBuilder {
-	private settings: Partial<OfficeSettingsType> = {};
+export class OfficePropertiesBuilder {
+	private settings: Partial<OfficePropertiesType> = {};
 	private validDays = week_days;
 
 	setName(name: string): this {
@@ -52,7 +52,7 @@ export class OfficeSettingsBuilder {
 		return this;
 	}
 
-	build(): OfficeSettingsType {
+	build(): OfficePropertiesType {
 		if (
 			!this.settings.name ||
 			this.settings.size === undefined ||
@@ -62,6 +62,6 @@ export class OfficeSettingsBuilder {
 		) {
 			throw new Error('Missing fields to build OfficeSettings');
 		}
-		return this.settings as OfficeSettingsType;
+		return this.settings as OfficePropertiesType;
 	}
 }

@@ -1,7 +1,7 @@
 import { randomUUIDv7 } from 'bun';
-import { OfficeSettingsType } from './OfficeSettingsBuilder';
+import { OfficePropertiesType } from '../shared/OfficeSettingsBuilder';
 
-export class Office implements OfficeSettingsType {
+export class Office implements OfficePropertiesType {
 	public id: string;
 	public name: string;
 	public size: number;
@@ -16,7 +16,7 @@ export class Office implements OfficeSettingsType {
 		daysAvailable,
 		openingHour,
 		closingHour,
-	}: OfficeSettingsType) {
+	}: OfficePropertiesType) {
 		!id ? (this.id = randomUUIDv7('base64url')) : (this.id = id);
 		this.name = name;
 		this.size = size;
