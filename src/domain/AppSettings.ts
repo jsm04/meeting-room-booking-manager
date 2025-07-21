@@ -1,6 +1,5 @@
 export type AppSettingsType = {
-	persistentDatabase: string;
-	volatileDatabase: string;
+	database_path: string;
 	env_mode: 'development' | 'production';
 	appName: string;
 };
@@ -11,8 +10,7 @@ export class AppSettings {
 
 	private constructor() {
 		this.settings = Object.freeze({
-			persistentDatabase: process.env.DATABASE || '',
-			volatileDatabase: process.env.MEMORY_DATABASE || '',
+			database_path: process.env.DATABASE || '',
 			env_mode: (process.env.NODE_ENV as AppSettingsType['env_mode']) || '',
 			appName: 'Office Room Booking Manager',
 		});

@@ -1,13 +1,5 @@
-import { week_days, WeekDay } from '../domain/const';
-
-export type OfficePropertiesType = {
-	id?: string;
-	name: string;
-	size: number;
-	daysAvailable: string[];
-	openingHour: string;
-	closingHour: string;
-};
+import { week_days, WeekDay } from './const';
+import { OfficePropertiesType } from '../model/Office';
 
 export class OfficePropertiesBuilder {
 	private settings: Partial<OfficePropertiesType> = {};

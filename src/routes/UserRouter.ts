@@ -3,8 +3,6 @@ import { BaseRoute } from './BaseRouter';
 export class UserRoute extends BaseRoute {
 	path = '/api/users';
 
-	/* 	Public */
-
 	get routes() {
 		return {
 			[this.add('hello')]: {
@@ -12,10 +10,6 @@ export class UserRoute extends BaseRoute {
 			},
 		};
 	}
-
-	/* 	Private */
-
-	/* 	Methods */
 
 	helloWorld = async () => {
 		return Response.json({

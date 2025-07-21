@@ -1,4 +1,6 @@
 import { Database } from 'bun:sqlite';
+import { DB } from './DbSingleton';
+import { BaseRepository } from './BaseRepository';
 
 export type Office = {
 	id: string;
@@ -9,8 +11,12 @@ export type Office = {
 	closingHour: string;
 };
 
-export class OfficeRepository {
-	constructor(private db: Database) {
+export class OfficeRepository extends BaseRepository {
+	constructor(table_name: string) {
+		super(table_name);
+	}
+
+	protected createTable() {
 		this.db.run(`
       CREATE TABLE IF NOT EXISTS offices (
         id TEXT PRIMARY KEY,

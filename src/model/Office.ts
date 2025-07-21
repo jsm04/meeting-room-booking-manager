@@ -1,5 +1,13 @@
 import { randomUUIDv7 } from 'bun';
-import { OfficePropertiesType } from '../shared/OfficeSettingsBuilder';
+
+export type OfficePropertiesType = {
+	id?: string;
+	name: string;
+	size: number;
+	daysAvailable: string[];
+	openingHour: string;
+	closingHour: string;
+};
 
 export class Office implements OfficePropertiesType {
 	public id: string;
