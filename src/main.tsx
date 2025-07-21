@@ -1,14 +1,13 @@
 import { serve } from 'bun';
 import index from './view/index.html';
-import { UserRoute } from './routes/UserRouter';
-
-const userRoute = new UserRoute().routes;
+import { UserController } from './controllers/UserController';
+import { routes } from './router';
 
 const server = serve({
 	routes: {
 		// Serve index.html for all unmatched routes.
 		'/*': index,
-		...userRoute,
+		...routes,
 	},
 
 	development: process.env.NODE_ENV !== 'production',

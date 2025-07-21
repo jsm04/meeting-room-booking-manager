@@ -20,8 +20,8 @@ export class UserRepository extends BaseRepository {
     `);
 	}
 
-	add(user: UserWithID): void {
-		this.db.run(`INSERT INTO users (id, name, email) VALUES (?, ?, ?)`, [
+	add(user: UserWithID) {
+		return this.db.run(`INSERT INTO users (id, name, email) VALUES (?, ?, ?)`, [
 			user.id,
 			user.name,
 			user.email,

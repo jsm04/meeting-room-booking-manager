@@ -1,9 +1,9 @@
-import { BaseRoute } from './BaseRouter';
+import { BaseController } from './BaseController';
 
-export class UserRoute extends BaseRoute {
+export class UserController extends BaseController {
 	path = '/api/users';
 
-	get routes() {
+	getRouteBindings() {
 		return {
 			[this.add('hello')]: {
 				GET: this.helloWorld,

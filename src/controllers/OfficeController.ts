@@ -1,9 +1,9 @@
-import { BaseRoute } from './BaseRouter';
+import { BaseController } from './BaseController';
 
-export class OfficeRoute extends BaseRoute {
+export class OfficeController extends BaseController {
 	path = '/api/office';
 
-	get routes() {
+	getRouteBindings() {
 		return {
 			[this.add('hello')]: {
 				GET: this.helloWorld,

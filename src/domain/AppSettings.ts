@@ -10,8 +10,9 @@ export class AppSettings {
 
 	private constructor() {
 		this.settings = Object.freeze({
-			database_path: process.env.DATABASE || '',
+			database_path: process.env.DB_PATH || '',
 			env_mode: (process.env.NODE_ENV as AppSettingsType['env_mode']) || '',
+			port: process.env.PORT,
 			appName: 'Office Room Booking Manager',
 		});
 	}
