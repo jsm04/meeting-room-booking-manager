@@ -1,19 +1,19 @@
-import { Database } from 'bun:sqlite';
-import { DB } from './DbSingleton';
-import { BaseRepository } from './BaseRepository';
+import { Database } from 'bun:sqlite'
+import { DB } from './DbSingleton'
+import { BaseRepository } from './BaseRepository'
 
 export type Office = {
-	id: string;
-	name: string;
-	size: number;
-	daysAvailable: string[];
-	openingHour: string;
-	closingHour: string;
-};
+	id: string
+	name: string
+	size: number
+	daysAvailable: string[]
+	openingHour: string
+	closingHour: string
+}
 
 export class OfficeRepository extends BaseRepository {
 	constructor(table_name: string) {
-		super(table_name);
+		super(table_name)
 	}
 
 	protected createTable() {
@@ -26,7 +26,7 @@ export class OfficeRepository extends BaseRepository {
         openingHour TEXT NOT NULL,
         closingHour TEXT NOT NULL
       )
-    `);
+    `)
 	}
 
 	add(office: Office): void {
@@ -39,16 +39,16 @@ export class OfficeRepository extends BaseRepository {
 				JSON.stringify(office.daysAvailable),
 				office.openingHour,
 				office.closingHour,
-			]
-		);
+			],
+		)
 	}
 
 	getById(id: string): Office | null {
-		const result = this.db
-			.query(`SELECT * FROM offices WHERE id = ?`)
-			.get(id) as [string, string, number, string, string, string] | undefined;
+		const result = this.db.query(`SELECT * FROM offices WHERE id = ?`).get(id) as
+			| [string, string, number, string, string, string]
+			| undefined
 
-		if (!result) return null;
+		if (!result) return null
 
 		return {
 			id: result[0],
@@ -57,15 +57,15 @@ export class OfficeRepository extends BaseRepository {
 			daysAvailable: JSON.parse(result[3]),
 			openingHour: result[4],
 			closingHour: result[5],
-		};
+		}
 	}
 
 	getAll(): Office[] {
 		const rows = this.db.query(`SELECT * FROM offices`).all() as
 			| [string, string, number, string, string, string][]
-			| undefined;
+			| undefined
 
-		if (!rows) return [];
+		if (!rows) return []
 
 		return rows.map((row) => ({
 			id: row[0],
@@ -74,7 +74,7 @@ export class OfficeRepository extends BaseRepository {
 			daysAvailable: JSON.parse(row[3]),
 			openingHour: row[4],
 			closingHour: row[5],
-		}));
+		}))
 	}
 
 	update(office: Office): void {
@@ -87,11 +87,11 @@ export class OfficeRepository extends BaseRepository {
 				office.openingHour,
 				office.closingHour,
 				office.id,
-			]
-		);
+			],
+		)
 	}
 
 	delete(id: string): void {
-		this.db.run(`DELETE FROM offices WHERE id = ?`, [id]);
+		this.db.run(`DELETE FROM offices WHERE id = ?`, [id])
 	}
 }

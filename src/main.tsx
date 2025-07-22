@@ -1,7 +1,7 @@
-import { serve } from 'bun';
-import index from './view/index.html';
-import { UserController } from './controllers/UserController';
-import { routes } from './router';
+import { serve } from 'bun'
+import index from './view/index.html'
+import { UserController } from './controllers/UserController'
+import { routes } from './router'
 
 const server = serve({
 	routes: {
@@ -11,6 +11,6 @@ const server = serve({
 	},
 
 	development: process.env.NODE_ENV !== 'production',
-});
+})
 
-console.log(`🚀 Server running at ${server.url}`);
+console.log(`🚀 Server running at ${server.url}`)
