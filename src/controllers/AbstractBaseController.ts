@@ -1,8 +1,8 @@
-import { AppSettings } from '../domain/AppSettings'
+import { AppManager } from '../domain/AppManager'
 import { HTTPMethod, RouteObject } from '../types'
 
 export abstract class BaseController {
-	protected app_settings = AppSettings.getInstance().get()
+	protected app_settings = AppManager.getInstance().state
 	abstract path: string
 	abstract getRouteBindings(): RouteObject
 	protected add(s: string) {

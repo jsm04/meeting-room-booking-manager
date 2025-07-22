@@ -6,13 +6,13 @@ export type UserType = {
 	email: string
 }
 
-export class User {
-	private id?: string
-	private name: string
-	private email: string
+export class User implements UserType {
+	id: string
+	name: string
+	email: string
 
 	constructor({ id, email, name }: UserType) {
-		!id ? (this.id = randomUUIDv7('base64url')) : (this.id = id)
+		this.id = id ?? randomUUIDv7('base64url')
 		this.name = name
 		this.email = email
 	}

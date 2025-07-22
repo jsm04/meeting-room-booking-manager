@@ -4,7 +4,7 @@ import { Time } from './Time'
 
 export class OfficePropertiesBuilder {
 	private properties: Partial<OfficePropertiesType> = {}
-	private validDays = week_days
+	private weekDays = week_days
 
 	setName(name: string): this {
 		if (!name.trim()) throw new Error('Name cannot be empty')
@@ -21,7 +21,7 @@ export class OfficePropertiesBuilder {
 	setDaysAvailable(days: WeekDay[]): this {
 		if (!days.length) throw new Error('DaysAvailable cannot be empty')
 		for (const day of days) {
-			if (!this.validDays.includes(day)) throw new Error(`Invalid day: ${day}`)
+			if (!this.weekDays.includes(day)) throw new Error(`Invalid day: ${day}`)
 		}
 		this.properties.daysAvailable = days
 		return this

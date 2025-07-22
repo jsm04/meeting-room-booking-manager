@@ -5,7 +5,7 @@ import { faker as Random } from '@faker-js/faker'
 import { Time } from './Time'
 import { week_days } from './const'
 
-export class MockerUtils {
+export class MockUtils {
 	static default_user = new User({ email: 'jhondoe@email.com', name: 'joe doe' })
 
 	static default_office = new Office(
@@ -37,5 +37,11 @@ export class MockerUtils {
 	static pickRandoms<T>(arr: T[], count: number = 5): T[] {
 		const shuffled = [...arr].sort(() => Math.random() - 0.5)
 		return shuffled.slice(0, count)
+	}
+
+	static repeat<Callback extends Function>(count: number, fn: Callback) {
+		for (let idx = 0; idx < count; idx++) {
+			fn()
+		}
 	}
 }

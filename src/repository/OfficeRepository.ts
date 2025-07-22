@@ -1,85 +1,51 @@
 import { Database } from 'bun:sqlite'
-import { DB } from './DbSingleton'
+import { DatabaseAccess } from './DatabaseSingleton'
 import { BaseRepository } from './BaseRepository'
+import { Office } from '../model/Office'
 
-export type Office = {
-	id: string
-	name: string
-	size: number
-	daysAvailable: string[]
-	openingHour: string
-	closingHour: string
-}
+export class OfficeRepository extends BaseRepository<Office> {
+	table_name = 'offices'
 
-export class OfficeRepository extends BaseRepository {
-	constructor(table_name: string) {
-		super(table_name)
+	constructor() {
+		super()
+		this.createTable()
 	}
 
 	protected createTable() {
 		this.db.run(`
-      CREATE TABLE IF NOT EXISTS offices (
+      CREATE TABLE IF NOT EXISTS ${this.table_name} (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         size INTEGER NOT NULL,
-        daysAvailable TEXT NOT NULL,
+        daysAvailable INTEGER NOT NULL,
         openingHour TEXT NOT NULL,
         closingHour TEXT NOT NULL
       )
     `)
 	}
 
-	add(office: Office): void {
-		this.db.run(
-			`INSERT INTO offices (id, name, size, daysAvailable, openingHour, closingHour) VALUES (?, ?, ?, ?, ?, ?)`,
-			[
-				office.id,
-				office.name,
-				office.size,
-				JSON.stringify(office.daysAvailable),
-				office.openingHour,
-				office.closingHour,
-			],
-		)
-	}
-
-	getById(id: string): Office | null {
-		const result = this.db.query(`SELECT * FROM offices WHERE id = ?`).get(id) as
-			| [string, string, number, string, string, string]
-			| undefined
-
-		if (!result) return null
-
-		return {
-			id: result[0],
-			name: result[1],
-			size: result[2],
-			daysAvailable: JSON.parse(result[3]),
-			openingHour: result[4],
-			closingHour: result[5],
+	create(office: Office): Office | null {
+		try {
+			this.db.run(
+				`INSERT INTO ${this.table_name} (id, name, size, daysAvailable, openingHour, closingHour) VALUES (?, ?, ?, ?, ?, ?)`,
+				[
+					office.id,
+					office.name,
+					office.size,
+					JSON.stringify(office.daysAvailable),
+					office.openingHour,
+					office.closingHour,
+				],
+			)
+			return office
+		} catch {
+			return null
 		}
 	}
 
-	getAll(): Office[] {
-		const rows = this.db.query(`SELECT * FROM offices`).all() as
-			| [string, string, number, string, string, string][]
-			| undefined
-
-		if (!rows) return []
-
-		return rows.map((row) => ({
-			id: row[0],
-			name: row[1],
-			size: row[2],
-			daysAvailable: JSON.parse(row[3]),
-			openingHour: row[4],
-			closingHour: row[5],
-		}))
-	}
-
-	update(office: Office): void {
-		this.db.run(
-			`UPDATE offices SET name = ?, size = ?, daysAvailable = ?, openingHour = ?, closingHour = ? WHERE id = ?`,
+	update(office: Office): Office | null {
+		const result = this.db.run(
+			`UPDATE ${this.table_name} SET name = ?, size = ?, daysAvailable = ?, openingHour = ?, closingHour = ? WHERE id = ?`,
 			[
 				office.name,
 				office.size,
@@ -89,9 +55,22 @@ export class OfficeRepository extends BaseRepository {
 				office.id,
 			],
 		)
+		return result.changes > 0 ? office : null
 	}
 
-	delete(id: string): void {
-		this.db.run(`DELETE FROM offices WHERE id = ?`, [id])
+	delete(id: string): Office | null {
+		const office = this.getById(id)
+		if (!office) return null
+
+		this.db.run(`DELETE FROM ${this.table_name} WHERE id = ?`, [id])
+		return office
+	}
+
+	getById(id: string): Office | null {
+		return this.db.query(`SELECT * FROM ${this.table_name} WHERE id = $id`).as(Office).get({ $id: id })
+	}
+
+	getAll(): Office[] {
+		return this.db.query(`SELECT * FROM ${this.table_name}`).as(Office).all()
 	}
 }
