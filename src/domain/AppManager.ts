@@ -49,7 +49,4 @@ export class AppManager {
 		return this.settings
 	}
 
-	get is_dev() {
-		return this.settings.env_mode === 'development'
-	}
 }

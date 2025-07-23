@@ -1,9 +1,9 @@
-import { officeRepository, userRepository } from './container'
 import { MockUtils } from './domain/MockUtils'
 import { DatabaseAccess } from './repository/DatabaseSingleton'
 import { OfficeRepository } from './repository/OfficeRepository'
 import { UserRepository } from './repository/UserRepository'
-import { UserService } from './services/UserService'
 
-const { log, assert } = console
+export const userRepository = new UserRepository()
+export const officeRepository = new OfficeRepository()
 
+MockUtils.seed(DatabaseAccess.getInstance())

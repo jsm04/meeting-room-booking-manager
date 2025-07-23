@@ -1,9 +1,12 @@
 import { Office } from '../model/Office'
+import { Database } from 'bun:sqlite'
 import { User } from '../model/User'
 import { OfficePropertiesBuilder } from './OfficePropBuilder'
 import { faker as Random } from '@faker-js/faker'
 import { Time } from './Time'
 import { week_days } from './const'
+import { officeRepository, userRepository } from '../container'
+import { AppManager } from './AppManager'
 
 export class MockUtils {
 	static default_user = new User({ email: 'jhondoe@email.com', name: 'joe doe' })
@@ -43,5 +46,23 @@ export class MockUtils {
 		for (let idx = 0; idx < count; idx++) {
 			fn()
 		}
+	}
+
+	static seed(instance: Database, seedLimit = 50) {
+		if (process.env.NODE_ENV == 'production') {
+			return
+		}
+
+		const defUser = MockUtils.default_user,
+			defOffice = MockUtils.default_office
+
+		officeRepository.exists(defOffice.id) && officeRepository.create(defOffice)
+		userRepository.exists(defUser.id) && userRepository.create(defUser)
+
+		if (officeRepository.count() < seedLimit)
+			MockUtils.repeat(seedLimit, () => officeRepository.create(MockUtils.newOffice()))
+
+		if (userRepository.count() < seedLimit)
+			MockUtils.repeat(seedLimit, () => userRepository.create(MockUtils.newUser()))
 	}
 }

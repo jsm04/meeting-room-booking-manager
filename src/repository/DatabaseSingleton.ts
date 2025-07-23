@@ -1,22 +1,18 @@
 import { Database } from 'bun:sqlite'
 import { AppManager } from '../domain/AppManager'
+import { MockUtils } from '../domain/MockUtils'
 
 export class DatabaseAccess {
 	private static app_settings = AppManager.getInstance().state
 	private static cache_instance: Database
 	private static instance: Database
 
-	private constructor() {}
-
 	static getInstance(type: 'volatile' | 'main' = 'main'): Database {
 		if (type === 'main') {
 			if (!DatabaseAccess.instance) {
 				DatabaseAccess.instance = new Database(this.app_settings.database_path)
-				// Enable SQL WAL mode
-				// ref: https://bun.sh/docs/api/sqlite#wal-mode
-				this.instance.exec('PRAGMA journal_mode = WAL;')
+				this.configure(DatabaseAccess.instance)
 			}
-			this.seed(DatabaseAccess.instance)
 			return DatabaseAccess.instance
 		}
 
@@ -27,13 +23,14 @@ export class DatabaseAccess {
 				safeIntegers: true,
 				strict: true,
 			})
-
-			this.seed(DatabaseAccess.cache_instance)
+			this.configure(DatabaseAccess.cache_instance)
 		}
 		return DatabaseAccess.cache_instance
 	}
 
-	private static seed(instance: Database) {
+	private static configure(instance: Database) {
+		// Enable SQL WAL mode
+		// ref: https://bun.sh/docs/api/sqlite#wal-mode
 		instance.exec('PRAGMA journal_mode = WAL;')
 	}
 }

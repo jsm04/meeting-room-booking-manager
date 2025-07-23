@@ -33,3 +33,7 @@ notepad
 
 # Finder (MacOS) folder config
 .DS_Store
+
+#misc
+dev.ts
+data/
