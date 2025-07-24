@@ -2,5 +2,5 @@ import { User } from '../model/User'
 import { UserRepository } from '../repository/UserRepository'
 
 export class UserService {
-	constructor() {}
+	constructor(private readonly userRepository: UserRepository) {}
 }

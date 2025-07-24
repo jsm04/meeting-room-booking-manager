@@ -1,7 +1,7 @@
-import { UserType } from '../model/User'
+import { UserProps } from '../model/User'
 
 export class UserBuilder {
-	private user: Partial<UserType> = {}
+	private user: Partial<UserProps> = {}
 	static email_regex = /^\S+@\S+\.\S+$/
 
 	setName(name: string): this {
@@ -18,9 +18,9 @@ export class UserBuilder {
 		return this
 	}
 
-	build(): UserType {
+	build(): UserProps {
 		if (!this.user.name) throw new Error('Name is required')
 		if (!this.user.email) throw new Error('Email is required')
-		return this.user as UserType
+		return this.user as UserProps
 	}
 }

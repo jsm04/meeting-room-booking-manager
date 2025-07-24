@@ -13,12 +13,11 @@ export class UserRepository extends BaseRepository<User> {
 
 	protected createTable() {
 		this.db.run(`
-      CREATE TABLE IF NOT EXISTS ${this.table_name} (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE
-      )
-    `)
+        CREATE TABLE IF NOT EXISTS ${this.table_name} (
+			id TEXT PRIMARY KEY,
+			name TEXT NOT NULL,
+			email TEXT NOT NULL UNIQUE
+      )`)
 	}
 
 	create(user: User): User | null {

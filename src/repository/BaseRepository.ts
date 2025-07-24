@@ -28,8 +28,8 @@ export abstract class BaseRepository<T> {
 	}
 
 	clear(): void {
-		if (this.appManager.is_dev) this.db.run(`DELETE FROM ${this.table_name}`)
-		else throw Error('This wipes the entire table. Dont use in prod. STOP.')
+		if (this.appManager.state.env_mode === 'development') this.db.run(`DELETE FROM ${this.table_name}`)
+		else throw Error('This wipes the entire table. Dont use in production. STOP.')
 	}
 
 	find(filterFn: (entity: T) => boolean): T[] {

@@ -1,9 +1,9 @@
 import { week_days, WeekDay } from './const'
-import { OfficePropertiesType } from '../model/Office'
-import { Time } from './Time'
+import { OfficePropsType } from '../model/Office'
+import { TimeUtils } from './Time'
 
 export class OfficePropertiesBuilder {
-	private properties: Partial<OfficePropertiesType> = {}
+	private properties: Partial<OfficePropsType> = {}
 	private weekDays = week_days
 
 	setName(name: string): this {
@@ -27,21 +27,24 @@ export class OfficePropertiesBuilder {
 		return this
 	}
 
-	setOpeningHour(hour: string): this {
-		if (!Time.checkTimeFormat(hour)) throw new Error('Invalid opening hour format')
-		this.properties.openingHour = hour
+	setOpeningHour(d: Date): this {
+		this.properties.openingHour = d.toISOString()
 		return this
 	}
 
-	setClosingHour(hour: string): this {
-		if (!Time.checkTimeFormat(hour)) throw new Error('Invalid closing hour format')
-		if (this.properties.openingHour && hour <= this.properties.openingHour)
+	setClosingHour(d: Date): this {
+		const opening = this.properties.openingHour ? new Date(this.properties.openingHour) : null
+
+		if (opening && d.getTime() <= opening.getTime()) {
 			throw new Error('Closing hour must be after opening hour')
-		this.properties.closingHour = hour
+		}
+
+		this.properties.closingHour = d.toISOString()
+
 		return this
 	}
 
-	build(): OfficePropertiesType {
+	build(): OfficePropsType {
 		if (
 			!this.properties.name ||
 			this.properties.size === undefined ||
@@ -51,6 +54,6 @@ export class OfficePropertiesBuilder {
 		) {
 			throw new Error('Missing fields to build OfficeSettings')
 		}
-		return this.properties as OfficePropertiesType
+		return this.properties as OfficePropsType
 	}
 }

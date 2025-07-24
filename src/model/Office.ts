@@ -1,9 +1,10 @@
 import { randomUUIDv7 } from 'bun'
 import { WeekDay } from '../domain/const'
-import { Time } from '../domain/Time'
+import { TimeUtils } from '../domain/Time'
 import { WeekDayBitMask } from '../domain/utils'
+import { BaseModel } from './BaseModel'
 
-export type OfficePropertiesType = {
+export type OfficePropsType = {
 	id?: string
 	name: string
 	size: number
@@ -12,7 +13,7 @@ export type OfficePropertiesType = {
 	closingHour: string
 }
 
-export class Office {
+export class Office extends BaseModel<Office> {
 	id: string
 	name: string
 	size: number
@@ -20,8 +21,9 @@ export class Office {
 	openingHour: string
 	closingHour: string
 
-	constructor({ id, name, size, daysAvailable, openingHour, closingHour }: OfficePropertiesType) {
-		this.id = id ?? randomUUIDv7('base64url')
+	constructor({ id, name, size, daysAvailable, openingHour, closingHour }: OfficePropsType) {
+		super()
+		this.id = this.genUUID(id)
 		this.name = name
 		this.size = size
 		this.daysAvailable = WeekDayBitMask.encodeDays(daysAvailable)
@@ -29,18 +31,22 @@ export class Office {
 		this.closingHour = closingHour
 	}
 
-	isOpen(day: WeekDay, hour: string): boolean {
-		if (!Time.checkTimeFormat(hour)) throw new Error('Invalid time format')
+	isOpen(day: WeekDay, hour: Date): boolean {
+		const [openingHour, closingHour] = this.toDate()
 		return (
 			WeekDayBitMask.decodeDays(this.daysAvailable).includes(day) &&
-			hour >= this.openingHour &&
-			hour <= this.closingHour
+			hour >= openingHour &&
+			hour <= this.lastReservableTurn()
 		)
 	}
 
-	get state() {
-		const { id, name, size, openingHour, closingHour } = this
-		const daysAvailable = WeekDayBitMask.decodeDays(this.daysAvailable)
-		return { id, name, size, openingHour, closingHour, daysAvailable }
+	lastReservableTurn(thresholdInMinutes = 60): Date {
+		const [_, closingHour] = this.toDate()
+		const lastTurnMs = closingHour.getTime() - thresholdInMinutes * 60000
+		return new Date(lastTurnMs)
+	}
+
+	private toDate() {
+		return [new Date(this.openingHour), new Date(this.closingHour)]
 	}
 }

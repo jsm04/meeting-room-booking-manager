@@ -3,23 +3,25 @@ import { Database } from 'bun:sqlite'
 import { User } from '../model/User'
 import { OfficePropertiesBuilder } from './OfficePropBuilder'
 import { faker as Random } from '@faker-js/faker'
-import { Time } from './Time'
+import { TimeUtils } from './Time'
 import { week_days } from './const'
-import { officeRepository, userRepository } from '../container'
+import { officeRepository, reservationRepository, userRepository } from '../container'
 import { AppManager } from './AppManager'
+import { Reservation, ReservationProps } from '../model/Reservation'
+import { ReservationRepository } from '../repository/ReservationRepository'
 
 export class MockUtils {
 	static default_user = new User({ email: 'jhondoe@email.com', name: 'joe doe' })
 
-	static default_office = new Office(
-		new OfficePropertiesBuilder()
-			.setName('MockOffice')
-			.setSize(22)
-			.setDaysAvailable(['Monday', 'Thursday', 'Wednesday'])
-			.setOpeningHour('08:00')
-			.setClosingHour('20:30')
-			.build(),
-	)
+	// static default_office = new Office(
+	// 	new OfficePropertiesBuilder()
+	// 		.setName('MockOffice')
+	// 		.setSize(22)
+	// 		.setDaysAvailable(['Monday', 'Thursday', 'Wednesday'])
+	// 		.setOpeningHour()
+	// 		.setClosingHour()
+	// 		.build(),
+	// )
 
 	static newUser() {
 		return new User({ email: Random.internet.email(), name: Random.person.fullName() })
@@ -28,13 +30,40 @@ export class MockUtils {
 	static newOffice() {
 		const { int } = Random.number
 
+		const dateMock = () =>
+			new Date(
+				2025,
+				int({ min: 0, max: 11 }),
+				int({ min: 1, max: 31 }),
+				int({ min: 6, max: 10 }),
+				int({ min: 14, max: 59 }),
+			).toISOString()
+
 		const name = Random.commerce.productName(),
 			size = int({ min: 16, max: 200 }),
-			openingHour = Time.toTimeString(int({ min: 6, max: 10 }), int({ min: 1, max: 59 })),
-			closingHour = Time.toTimeString(int({ min: 15, max: 23 }), int({ min: 1, max: 59 })),
+			openingHour = dateMock(),
+			closingHour = dateMock(),
 			daysAvailable = this.pickRandoms([...week_days])
 
 		return new Office({ name, size, openingHour, closingHour, daysAvailable })
+	}
+
+	static newReservation() {
+		const user = this.pickRandoms(userRepository.getAll(), 1)[0]
+		const office = this.pickRandoms(officeRepository.getAll(), 1)[0]
+
+		const userId = user.id,
+			officeId = office.id
+
+		const { int } = Random.number
+		const startTime = TimeUtils.addMinutesToISOString(office.openingHour, int({ min: 30, max: 180 }))
+		const endTime = TimeUtils.addMinutesToISOString(startTime, 60)
+
+		return new Reservation({ userId, endTime, officeId, startTime })
+	}
+
+	static addMockReservation() {
+		reservationRepository.create(this.newReservation())
 	}
 
 	static pickRandoms<T>(arr: T[], count: number = 5): T[] {
@@ -48,21 +77,29 @@ export class MockUtils {
 		}
 	}
 
+	static #isProd() {
+		return process.env.NODE_ENV === 'production'
+	}
+
 	static seed(instance: Database, seedLimit = 50) {
-		if (process.env.NODE_ENV == 'production') {
+		if (this.#isProd()) {
 			return
 		}
 
-		const defUser = MockUtils.default_user,
-			defOffice = MockUtils.default_office
-
-		officeRepository.exists(defOffice.id) && officeRepository.create(defOffice)
-		userRepository.exists(defUser.id) && userRepository.create(defUser)
-
 		if (officeRepository.count() < seedLimit)
-			MockUtils.repeat(seedLimit, () => officeRepository.create(MockUtils.newOffice()))
+			this.repeat(seedLimit - 1, () => officeRepository.create(this.newOffice()))
 
-		if (userRepository.count() < seedLimit)
-			MockUtils.repeat(seedLimit, () => userRepository.create(MockUtils.newUser()))
+		if (userRepository.count() < seedLimit) this.repeat(seedLimit - 1, () => userRepository.create(this.newUser()))
+
+		if (reservationRepository.count() < seedLimit) this.repeat(seedLimit, () => this.addMockReservation())
+	}
+
+	static clearDatabase() {
+		if (this.#isProd()) {
+			return
+		}
+		userRepository.clear()
+		officeRepository.clear()
+		reservationRepository.clear()
 	}
 }

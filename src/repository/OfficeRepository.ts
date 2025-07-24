@@ -13,29 +13,21 @@ export class OfficeRepository extends BaseRepository<Office> {
 
 	protected createTable() {
 		this.db.run(`
-      CREATE TABLE IF NOT EXISTS ${this.table_name} (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        size INTEGER NOT NULL,
-        daysAvailable INTEGER NOT NULL,
-        openingHour TEXT NOT NULL,
-        closingHour TEXT NOT NULL
-      )
-    `)
+		CREATE TABLE IF NOT EXISTS ${this.table_name} (
+			id TEXT PRIMARY KEY,
+			name TEXT NOT NULL,
+			size INTEGER NOT NULL,
+			daysAvailable INTEGER NOT NULL,
+			openingHour TEXT NOT NULL,
+			closingHour TEXT NOT NULL
+		)`)
 	}
 
 	create(office: Office): Office | null {
 		try {
 			this.db.run(
 				`INSERT INTO ${this.table_name} (id, name, size, daysAvailable, openingHour, closingHour) VALUES (?, ?, ?, ?, ?, ?)`,
-				[
-					office.id,
-					office.name,
-					office.size,
-					JSON.stringify(office.daysAvailable),
-					office.openingHour,
-					office.closingHour,
-				],
+				[office.id, office.name, office.size, office.daysAvailable, office.openingHour, office.closingHour],
 			)
 			return office
 		} catch {
@@ -49,7 +41,7 @@ export class OfficeRepository extends BaseRepository<Office> {
 			[
 				office.name,
 				office.size,
-				JSON.stringify(office.daysAvailable),
+				office.daysAvailable,
 				office.openingHour,
 				office.closingHour,
 				office.id,

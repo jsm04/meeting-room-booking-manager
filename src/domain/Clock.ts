@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events'
-import { Time } from './Time'
+import { TimeUtils } from './Time'
 
 type ClockState = {
 	hour: number
@@ -13,7 +13,7 @@ export class Clock extends EventEmitter {
 	private second: number
 	private timerId?: ReturnType<typeof setInterval>
 
-	constructor({ hour = 0, minute = 0, second = 0 }: ClockState, autoStart: boolean = true) {
+	constructor({ hour = 0, minute = 0, second = 0 }: ClockState, autoStart: boolean = false) {
 		super()
 
 		this.hour = hour % 24
@@ -37,7 +37,7 @@ export class Clock extends EventEmitter {
 			this.hour = 0
 		}
 
-		this.emit('tick', this.stringifyState())
+		this.emit('tick', this.getState())
 	}
 
 	start(intervalMs: number = 1000): void {
@@ -59,13 +59,18 @@ export class Clock extends EventEmitter {
 		return this
 	}
 
-	stringifyState(): string {
+	getState(): string {
 		const pad = (n: number) => n.toString().padStart(2, '0')
 		return `${pad(this.hour)}:${pad(this.minute)}:${pad(this.second)}`
 	}
 
 	toTimeString(): string {
-		return Time.toTimeString(this.hour, this.minute)
+		return TimeUtils.toTimeString(this.hour, this.minute)
+	}
+
+	toDate(): Date {
+		const now = new Date()
+		return new Date(now.getFullYear(), now.getMonth(), now.getDate(), this.hour, this.minute, this.second)
 	}
 
 	compare(other: Clock): number {
@@ -73,5 +78,29 @@ export class Clock extends EventEmitter {
 		const totalOther = other.hour * 3600 + other.minute * 60 + other.second
 
 		return Math.sign(totalThis - totalOther)
+	}
+
+	static newClockState(hour: number, minute: number, second: number): ClockState {
+		if (second === 60) {
+			second = 0
+			minute += 1
+		}
+		if (minute === 60) {
+			minute = 0
+			hour += 1
+		}
+		if (hour === 24) {
+			hour = 0
+		}
+
+		return {
+			hour,
+			minute,
+			second,
+		}
+	}
+
+	static toTimeString(hour: number, minute: number): string {
+		return TimeUtils.toTimeString(hour, minute)
 	}
 }
