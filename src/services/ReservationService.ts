@@ -1,4 +1,4 @@
-import { TimeUtils } from '../domain/Time'
+import { TimeUtils } from '../domain/TimeUtils'
 import { Office } from '../model/Office'
 import { Reservation } from '../model/Reservation'
 import { OfficeRepository } from '../repository/OfficeRepository'
@@ -44,8 +44,8 @@ export class ReservationService {
 		const turns = this.reservationRepository.find((reservation) => {
 			return !(
 				reservation.officeId === officeId &&
-				office.isOpen(reservationDay, from) &&
-				reservation.isWithinOfficeHours(new Date(office.openingHour), office.lastReservableTurn())
+				office.isAvailable(reservationDay, from) &&
+				reservation.isWithinOfficeHours(office.openingHour, office.lastReservableTurn())
 			)
 		})
 

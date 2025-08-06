@@ -27,8 +27,8 @@ export class Reservation extends BaseModel<Reservation> {
 		return true
 	}
 
-	isWithinOfficeHours(open: Date, close: Date): boolean {
-		const [startTime, endTime] = this.toDate()
+	isWithinOfficeHours(open: string, close: string): boolean {
+		const [startTime, endTime] = this.toISOString()
 		return startTime >= open && endTime <= close
 	}
 
@@ -46,7 +46,11 @@ export class Reservation extends BaseModel<Reservation> {
 		)
 	}
 
-	private toDate() {
+	toISOString() {
+		return this.toDate().map((d) => d.toISOString())
+	}
+
+	toDate() {
 		return [new Date(this.startTime), new Date(this.endTime)]
 	}
 }

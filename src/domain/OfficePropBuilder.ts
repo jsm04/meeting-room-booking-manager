@@ -1,6 +1,5 @@
 import { week_days, WeekDay } from './const'
 import { OfficePropsType } from '../model/Office'
-import { TimeUtils } from './Time'
 
 export class OfficePropertiesBuilder {
 	private properties: Partial<OfficePropsType> = {}
@@ -27,20 +26,18 @@ export class OfficePropertiesBuilder {
 		return this
 	}
 
-	setOpeningHour(d: Date): this {
-		this.properties.openingHour = d.toISOString()
+	setOpeningHour(d: Date | string): this {
+		this.properties.openingHour = d instanceof Date ? d.toISOString() : d
 		return this
 	}
 
-	setClosingHour(d: Date): this {
+	setClosingHour(d: Date | string): this {
 		const opening = this.properties.openingHour ? new Date(this.properties.openingHour) : null
-
+		if (typeof d === 'string') d = new Date(d)
 		if (opening && d.getTime() <= opening.getTime()) {
 			throw new Error('Closing hour must be after opening hour')
 		}
-
 		this.properties.closingHour = d.toISOString()
-
 		return this
 	}
 

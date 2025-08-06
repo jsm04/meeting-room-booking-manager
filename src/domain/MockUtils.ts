@@ -3,7 +3,6 @@ import { Database } from 'bun:sqlite'
 import { User } from '../model/User'
 import { OfficePropertiesBuilder } from './OfficePropBuilder'
 import { faker as Random } from '@faker-js/faker'
-import { TimeUtils } from './Time'
 import { week_days } from './const'
 import { officeRepository, reservationRepository, userRepository } from '../container'
 import { AppManager } from './AppManager'
@@ -13,15 +12,15 @@ import { ReservationRepository } from '../repository/ReservationRepository'
 export class MockUtils {
 	static default_user = new User({ email: 'jhondoe@email.com', name: 'joe doe' })
 
-	// static default_office = new Office(
-	// 	new OfficePropertiesBuilder()
-	// 		.setName('MockOffice')
-	// 		.setSize(22)
-	// 		.setDaysAvailable(['Monday', 'Thursday', 'Wednesday'])
-	// 		.setOpeningHour()
-	// 		.setClosingHour()
-	// 		.build(),
-	// )
+	static default_office = new Office(
+		new OfficePropertiesBuilder()
+			.setName('MockOffice')
+			.setSize(22)
+			.setDaysAvailable(['Monday', 'Thursday', 'Wednesday'])
+			.setOpeningHour('2025-03-05T10:40:00.000Z')
+			.setClosingHour('2025-03-05T20:40:00.000Z')
+			.build(),
+	)
 
 	static newUser() {
 		return new User({ email: Random.internet.email(), name: Random.person.fullName() })
@@ -56,10 +55,17 @@ export class MockUtils {
 			officeId = office.id
 
 		const { int } = Random.number
-		const startTime = TimeUtils.addMinutesToISOString(office.openingHour, int({ min: 30, max: 180 }))
-		const endTime = TimeUtils.addMinutesToISOString(startTime, 60)
+		const startTime = new Date(office.openingHour)
+		startTime.setMinutes(startTime.getMinutes() + int({ min: 30, max: 180 }))
+		const endTime = new Date(startTime)
+		endTime.setMinutes(startTime.getMinutes() + 60)
 
-		return new Reservation({ userId, endTime, officeId, startTime })
+		return new Reservation({
+			userId,
+			officeId,
+			startTime: startTime.toISOString(),
+			endTime: endTime.toISOString(),
+		})
 	}
 
 	static addMockReservation() {

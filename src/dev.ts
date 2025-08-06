@@ -1,6 +1,6 @@
 import { officeRepository, reservationRepository, reservationService, userRepository } from './container'
 import { MockUtils } from './domain/MockUtils'
-import { TimeUtils } from './domain/Time'
+import { TimeUtils } from './domain/TimeUtils'
 import { Reservation } from './model/Reservation'
 import { DatabaseAccess } from './repository/DatabaseSingleton'
 import { OfficeRepository } from './repository/OfficeRepository'
@@ -18,4 +18,7 @@ const reservationEnd = TimeUtils.addMinutesToISOString(office.openingHour, 100)
 tmp = reservationStart
 log(tmp)
 
-reservationService.isOfficeAvailable(officeId, new Date(reservationStart), new Date(reservationEnd))
+// tmp = reservationService.isOfficeAvailable(officeId, new Date(reservationStart), new Date(reservationEnd))
+
+
+log(tmp)
